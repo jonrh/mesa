@@ -567,16 +567,6 @@ class ContinuousSpace:
             heading = tuple(heading)
         return heading
 
-    def reciprocal_heading(self):
-        """
-        Opposite heading for rebounding if agent reaches the edge of the space
-        when non-toroidal.
-        """
-        # Todo: make sure this is working
-        old_heading = get_heading(pos_1, pos_2)
-        reciprocal = numpy.reciprocal(old_heading)
-        return reciprocal
-
     def get_distance(self, pos_1, pos_2):
         """
         Get the distance between two point, accounting for toroidal space.
@@ -598,13 +588,12 @@ class ContinuousSpace:
 
         If the coordinate is out-of-bounds and the space is toroidal, return
         the corresponding point within the space. If the space is not toroidal,
-        a new heading is assigned to the agent.
+        return a new heading.
 
         Args:
             pos: Coordinate tuple to convert.
 
         """
-        # Todo: check logic.
         if self.torus:
             if not self.out_of_bounds(pos):
                 return pos
@@ -618,8 +607,9 @@ class ContinuousSpace:
         elif not self.torus:
             if not self.out_of_bounds(pos):
                 return pos
-            else:
-                return pos - reciprocal
+            elif self.near_boundary(pos):
+                # Todo: figure out what the behaviour should be and how to code it.
+                return pos
 
     def _point_to_cell(self, pos):
         """ Get the cell coordinates that a given x,y point falls in. """
@@ -636,6 +626,12 @@ class ContinuousSpace:
         x, y = pos
         return (x < self.x_min or x >= self.x_max or
                 y < self.y_min or y >= self.y_max)
+
+    def near_boundary(self, pos):
+        """ Check if a point is within a certain distance of the boundary. """
+        x, y = pos
+        return (x == self.x_min + 2 or x == self.x_max - 2 or
+                y == self.y_min + 2 or y == self.y_max - 2)
 
 
 class NetworkGrid:
