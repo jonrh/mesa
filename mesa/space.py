@@ -613,6 +613,8 @@ class ContinuousSpace:
 
     def _point_to_cell(self, pos):
         """ Get the cell coordinates that a given x,y point falls in. """
+        if self.out_of_bounds(pos):
+            raise Exception("Point out of bounds.")
         x, y = pos
         cell_x = math.floor((x - self.x_min) / self.cell_width)
         cell_y = math.floor((y - self.y_min) / self.cell_height)
